@@ -53,6 +53,11 @@ export default async function TemplatePreviewPage(props: PageProps<"/templates/[
                     ATS-friendly
                   </span>
                 )}
+                {template.premium && (
+                  <span className="rounded-md bg-accent/10 px-2 py-0.5 text-[11px] font-medium text-accent">
+                    Premium
+                  </span>
+                )}
               </div>
               <p className="mt-1 text-[13px] text-text-secondary">
                 {template.style.charAt(0).toUpperCase() + template.style.slice(1)}
@@ -68,6 +73,13 @@ export default async function TemplatePreviewPage(props: PageProps<"/templates/[
             {template.atsNote && (
               <p className="rounded-lg bg-bg-secondary px-3 py-2.5 text-[12.5px] leading-relaxed text-text-secondary">
                 {template.atsNote}
+              </p>
+            )}
+
+            {template.premium && (
+              <p className="text-[12.5px] text-text-secondary">
+                A premium template — included with a pass or credit pack.
+                Free to use while checkout is still in progress.
               </p>
             )}
 

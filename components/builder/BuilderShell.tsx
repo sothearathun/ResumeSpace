@@ -65,7 +65,7 @@ export function BuilderShell({ draftId }: { draftId: string }) {
 
       <Header statusText="Saved" />
 
-      <div className="grid flex-1 grid-cols-1 lg:grid-cols-[200px_1fr_1fr]">
+      <div className="grid flex-1 grid-cols-1 lg:grid-cols-[200px_minmax(0,1fr)_minmax(0,1fr)]">
         <div className="border-b border-border lg:border-r lg:border-b-0">
           <SectionsNav
             active={activeSection}

@@ -47,7 +47,7 @@ export function MasterResumeShell() {
         </p>
       </div>
 
-      <div className="grid flex-1 grid-cols-1 lg:grid-cols-[200px_1fr_360px]">
+      <div className="grid flex-1 grid-cols-1 lg:grid-cols-[200px_minmax(0,1fr)_360px]">
         <div className="border-b border-border lg:border-r lg:border-b-0">
           <SectionsNav
             active={activeSection}

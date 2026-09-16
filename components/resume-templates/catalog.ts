@@ -14,6 +14,7 @@ export const templateCatalog: TemplateMeta[] = [
     colorSlots: ["accentColor", "linkColor"],
     supportsLayoutToggle: false,
     supportsPhoto: true,
+    premium: false,
     defaultAppearance: {
       accentColor: "#2563eb",
       linkColor: "#2563eb",
@@ -35,6 +36,7 @@ export const templateCatalog: TemplateMeta[] = [
     colorSlots: ["accentColor", "linkColor"],
     supportsLayoutToggle: false,
     supportsPhoto: true,
+    premium: false,
     defaultAppearance: {
       accentColor: "#2563eb",
       linkColor: "#2563eb",
@@ -57,6 +59,7 @@ export const templateCatalog: TemplateMeta[] = [
     colorSlots: ["accentColor", "headerBg", "linkColor"],
     supportsLayoutToggle: true,
     supportsPhoto: true,
+    premium: true,
     defaultAppearance: {
       accentColor: "#2563eb",
       headerBg: "#eef2fa",
@@ -80,6 +83,7 @@ export const templateCatalog: TemplateMeta[] = [
     colorSlots: ["accentColor"],
     supportsLayoutToggle: false,
     supportsPhoto: true,
+    premium: false,
     defaultAppearance: {
       accentColor: "#1f2937",
       font: "inter",
@@ -101,6 +105,7 @@ export const templateCatalog: TemplateMeta[] = [
     colorSlots: ["accentColor", "headerBg", "linkColor"],
     supportsLayoutToggle: false,
     supportsPhoto: true,
+    premium: true,
     defaultAppearance: {
       accentColor: "#2563eb",
       headerBg: "#eef2fa",
@@ -123,6 +128,7 @@ export const templateCatalog: TemplateMeta[] = [
     colorSlots: ["accentColor", "linkColor"],
     supportsLayoutToggle: false,
     supportsPhoto: true,
+    premium: false,
     defaultAppearance: {
       accentColor: "#2563eb",
       linkColor: "#2563eb",
@@ -144,6 +150,7 @@ export const templateCatalog: TemplateMeta[] = [
     colorSlots: ["accentColor", "linkColor"],
     supportsLayoutToggle: false,
     supportsPhoto: true,
+    premium: false,
     defaultAppearance: {
       accentColor: "#2563eb",
       linkColor: "#2563eb",
@@ -165,6 +172,7 @@ export const templateCatalog: TemplateMeta[] = [
     colorSlots: ["accentColor"],
     supportsLayoutToggle: false,
     supportsPhoto: true,
+    premium: false,
     defaultAppearance: {
       accentColor: "#1f2937",
       font: "inter",
@@ -186,6 +194,7 @@ export const templateCatalog: TemplateMeta[] = [
     colorSlots: ["accentColor", "headerBg", "linkColor"],
     supportsLayoutToggle: false,
     supportsPhoto: true,
+    premium: true,
     defaultAppearance: {
       accentColor: "#2563eb",
       headerBg: "#eef2fa",
@@ -209,6 +218,7 @@ export const templateCatalog: TemplateMeta[] = [
     colorSlots: ["accentColor", "headerBg", "linkColor"],
     supportsLayoutToggle: false,
     supportsPhoto: true,
+    premium: true,
     defaultAppearance: {
       accentColor: "#2563eb",
       headerBg: "#2563eb",
@@ -231,6 +241,7 @@ export const templateCatalog: TemplateMeta[] = [
     colorSlots: ["accentColor", "linkColor"],
     supportsLayoutToggle: false,
     supportsPhoto: true,
+    premium: false,
     defaultAppearance: {
       accentColor: "#2563eb",
       linkColor: "#2563eb",

@@ -112,5 +112,8 @@ export type TemplateMeta = {
   colorSlots: ColorSlot[];
   supportsLayoutToggle: boolean;
   supportsPhoto: boolean;
+  /** Shown with a "Premium" badge — informational only for now (§pricing
+   * page); nothing actually blocks using it until real entitlements exist. */
+  premium: boolean;
   defaultAppearance: ResumeAppearance;
 };

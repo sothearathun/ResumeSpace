@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { templateCatalog } from "@/components/resume-templates/catalog";
 import { blogPosts } from "@/lib/blog/posts";
+import { resumeExamples } from "@/lib/resume-examples/examples";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -27,5 +28,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...templateRoutes, ...blogRoutes];
+  const exampleRoutes: MetadataRoute.Sitemap = resumeExamples.map((e) => ({
+    url: `${SITE_URL}/resume-examples/${e.slug}`,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...templateRoutes, ...blogRoutes, ...exampleRoutes];
 }

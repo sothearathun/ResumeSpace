@@ -32,6 +32,11 @@ export function TemplateCard({ template }: { template: TemplateMeta }) {
               ATS-friendly
             </span>
           )}
+          {template.premium && (
+            <span className="rounded-md bg-accent/10 px-2 py-0.5 text-[11px] font-medium text-accent">
+              Premium
+            </span>
+          )}
         </div>
         <p className="mt-1 text-[13px] text-text-secondary">{template.tagline}</p>
       </div>
