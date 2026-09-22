@@ -1,5 +1,5 @@
 import type { ResumeAppearance, ResumeContent } from "@/lib/resume/types";
-import { appearanceStyle } from "@/lib/resume/appearance";
+import { appearanceStyle, scaledAvatarSize } from "@/lib/resume/appearance";
 import { optionalSectionsToBlocks } from "@/lib/resume/optional-sections";
 import { Section, OptionalSectionBlocks } from "./Section";
 import { Avatar } from "./Avatar";
@@ -21,13 +21,13 @@ export function GraduateTemplate({
       className="w-full bg-white px-14 py-12 text-neutral-900"
       style={appearanceStyle(appearance)}
     >
-      <header className="flex items-center gap-5">
+      <header className="flex items-start gap-5">
         {contact.photoDataUrl && (
           <Avatar
             name={contact.name}
             photoDataUrl={contact.photoDataUrl}
             shape={appearance.photoShape}
-            size={76}
+            size={scaledAvatarSize(135, appearance.photoSize)}
           />
         )}
         <div>
@@ -35,7 +35,7 @@ export function GraduateTemplate({
           {contact.jobTitle && (
             <p className="mt-1 text-[1.05em] text-neutral-600">{contact.jobTitle}</p>
           )}
-          <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[0.85em] text-neutral-600">
+          <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[0.85em] text-(--link)">
             {[contact.email, contact.phone, contact.location, contact.linkedin, contact.portfolio]
               .filter(Boolean)
               .map((item) => (
@@ -77,7 +77,7 @@ export function GraduateTemplate({
 
         {skills.length > 0 && (
           <Section title="Skills">
-            <p className="text-[0.88em] text-neutral-800">{skills.join(" · ")}</p>
+            <p className="text-[0.88em] text-neutral-800">{skills.filter(Boolean).join(" · ")}</p>
           </Section>
         )}
 

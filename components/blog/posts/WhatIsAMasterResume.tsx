@@ -44,7 +44,7 @@ export function WhatIsAMasterResume() {
         nothing.
       </p>
 
-      <h2>How this works on ResumeCraft</h2>
+      <h2>How this works on ResumeSpace</h2>
       <p>
         The{" "}
         <a href="/master-resume" className="text-accent hover:text-accent-hover">

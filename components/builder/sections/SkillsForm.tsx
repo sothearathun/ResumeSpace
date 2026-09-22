@@ -1,36 +1,28 @@
-import { useState } from "react";
 import { Field } from "../Field";
-import { inputClass } from "../inputStyles";
+import { textareaClass } from "../inputStyles";
 
 export function SkillsForm({
   skills,
   onChange,
+  onFocus,
 }: {
   skills: string[];
   onChange: (skills: string[]) => void;
+  onFocus: () => void;
 }) {
-  // Local text buffer so a trailing ", " while typing isn't immediately
-  // stripped by re-deriving the input value from the parsed array.
-  const [text, setText] = useState(skills.join(", "));
-
-  function handleChange(value: string) {
-    setText(value);
-    onChange(
-      value
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean)
-    );
-  }
-
   return (
-    <Field label="Skills" helperText="Separate each skill with a comma.">
-      <input
-        className={inputClass}
-        value={text}
-        onChange={(e) => handleChange(e.target.value)}
-        placeholder="Python, SQL, Excel, communication, teamwork"
+    <Field label="Skills" helperText="One skill per line — press Enter to add another.">
+      <textarea
+        className={textareaClass}
+        value={skills.join("\n")}
+        onChange={(e) => onChange(e.target.value.split("\n"))}
+        onFocus={onFocus}
+        placeholder={"Python\nSQL\nExcel\nCommunication\nTeamwork"}
       />
+      <p className="mt-1.5 text-[12px] text-text-secondary">
+        Tip: list specific tools and technologies, not just soft skills. Ask the AI Helper to suggest
+        skills based on your experience if you&rsquo;re stuck.
+      </p>
     </Field>
   );
 }

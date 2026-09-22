@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { pageMetadata } from "@/lib/seo";
 import { TemplatePreview } from "@/components/resume-templates/TemplatePreview";
 import { getTemplateMeta } from "@/components/resume-templates/catalog";
 import { resumeExamples, getResumeExample } from "@/lib/resume-examples/examples";
@@ -18,10 +19,12 @@ export async function generateMetadata(
   const { slug } = await props.params;
   const example = getResumeExample(slug);
   if (!example) return {};
-  return {
-    title: `${example.roleTitle} Resume Example — ResumeCraft`,
+  return pageMetadata({
+    title: `${example.roleTitle} Resume Example (Free Template)`,
     description: example.summary,
-  };
+    path: `/resume-examples/${example.slug}`,
+    keywords: [`${example.roleTitle.toLowerCase()} resume`, `${example.roleTitle.toLowerCase()} resume example`],
+  });
 }
 
 export default async function ResumeExamplePage(props: PageProps<"/resume-examples/[slug]">) {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ResumeExample } from "@/lib/resume-examples/examples";
-import { TemplatePreview } from "@/components/resume-templates/TemplatePreview";
+import { TemplatePreviewLazy } from "@/components/resume-templates/TemplatePreviewLazy";
 import { sampleResumes } from "@/lib/resume/sample-resumes";
 
 export function ExampleCard({ example }: { example: ResumeExample }) {
@@ -9,7 +9,7 @@ export function ExampleCard({ example }: { example: ResumeExample }) {
   return (
     <Link href={`/resume-examples/${example.slug}`} className="group flex flex-col gap-4">
       <div className="overflow-hidden rounded-lg border border-border transition-colors group-hover:border-accent/40">
-        <TemplatePreview templateKey={example.templateKey} />
+        <TemplatePreviewLazy templateKey={example.templateKey} />
       </div>
       <div>
         <h3 className="text-[15px] font-medium group-hover:text-accent">

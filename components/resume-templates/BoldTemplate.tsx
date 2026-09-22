@@ -1,5 +1,5 @@
 import type { ResumeAppearance, ResumeContent } from "@/lib/resume/types";
-import { appearanceStyle } from "@/lib/resume/appearance";
+import { appearanceStyle, scaledAvatarSize } from "@/lib/resume/appearance";
 import { optionalSectionsToBlocks } from "@/lib/resume/optional-sections";
 import { Section, OptionalSectionBlocks } from "./Section";
 import { Avatar } from "./Avatar";
@@ -15,13 +15,13 @@ export function BoldTemplate({
 
   return (
     <div className="w-full bg-white text-neutral-900" style={appearanceStyle(appearance)}>
-      <header className="flex items-center gap-6 bg-(--header-bg) px-14 py-10 text-white">
+      <header className="flex items-start gap-6 bg-(--header-bg) px-14 py-10 text-white">
         {contact.photoDataUrl && (
           <Avatar
             name={contact.name}
             photoDataUrl={contact.photoDataUrl}
             shape={appearance.photoShape}
-            size={84}
+            size={scaledAvatarSize(145, appearance.photoSize)}
             ring
           />
         )}
@@ -88,7 +88,7 @@ export function BoldTemplate({
 
           {skills.length > 0 && (
             <Section title="Skills">
-              <p className="text-[0.88em] text-neutral-800">{skills.join(" · ")}</p>
+              <p className="text-[0.88em] text-neutral-800">{skills.filter(Boolean).join(" · ")}</p>
             </Section>
           )}
         </div>

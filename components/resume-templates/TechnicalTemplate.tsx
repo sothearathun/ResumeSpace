@@ -1,5 +1,5 @@
 import type { ResumeAppearance, ResumeContent } from "@/lib/resume/types";
-import { appearanceStyle } from "@/lib/resume/appearance";
+import { appearanceStyle, scaledAvatarSize } from "@/lib/resume/appearance";
 import { optionalSectionsToBlocks } from "@/lib/resume/optional-sections";
 import { Section, OptionalSectionBlocks } from "./Section";
 import { Avatar } from "./Avatar";
@@ -18,13 +18,13 @@ export function TechnicalTemplate({
       className="w-full bg-white px-14 py-12 text-neutral-900"
       style={appearanceStyle(appearance)}
     >
-      <header className="flex items-center gap-5">
+      <header className="flex items-start gap-5">
         {contact.photoDataUrl && (
           <Avatar
             name={contact.name}
             photoDataUrl={contact.photoDataUrl}
             shape={appearance.photoShape}
-            size={76}
+            size={scaledAvatarSize(135, appearance.photoSize)}
           />
         )}
         <div>
@@ -32,7 +32,7 @@ export function TechnicalTemplate({
           {contact.jobTitle && (
             <p className="mt-1 text-[1.05em] text-neutral-600">{contact.jobTitle}</p>
           )}
-          <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[0.85em] text-neutral-600">
+          <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[0.85em] text-(--link)">
             {[contact.email, contact.phone, contact.location, contact.linkedin, contact.portfolio]
               .filter(Boolean)
               .map((item) => (
@@ -52,7 +52,7 @@ export function TechnicalTemplate({
         {skills.length > 0 && (
           <Section title="Skills">
             <div className="flex flex-wrap gap-1.5">
-              {skills.map((skill) => (
+              {skills.filter(Boolean).map((skill) => (
                 <span
                   key={skill}
                   className="rounded-md bg-neutral-100 px-2 py-0.5 text-[0.78em] text-neutral-800"

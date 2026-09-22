@@ -11,10 +11,12 @@ export function OptionalSectionForm({
   sectionKey,
   entries,
   onChange,
+  onFocusField,
 }: {
   sectionKey: OptionalSectionKey;
   entries: Entry[];
   onChange: (entries: Entry[]) => void;
+  onFocusField: (entryId: string, fieldKey: string) => void;
 }) {
   const meta = optionalSectionMeta[sectionKey];
 
@@ -57,7 +59,12 @@ export function OptionalSectionForm({
                   className={textareaClass}
                   value={entry[field.key] ?? ""}
                   onChange={(e) => update(entry.id, { [field.key]: e.target.value })}
+                  onFocus={() => onFocusField(entry.id, field.key)}
                 />
+                <p className="mt-1.5 text-[12px] text-text-secondary">
+                  Tip: briefly describe what you did and the impact it had. The AI Helper can draft or
+                  adjust this for you.
+                </p>
               </Field>
             ) : (
               <Field key={field.key} label={field.label}>

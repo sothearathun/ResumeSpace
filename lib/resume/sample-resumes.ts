@@ -1,9 +1,10 @@
 import type { ResumeContent, TemplateKey } from "./types";
+import { sampleExtras, type SampleExtras } from "./sample-extras";
 
 /** Realistic placeholder content used to render believable template
  * previews on the marketplace, preview pages, and (later) empty builder
  * state — never lorem ipsum. */
-export const sampleResumes: Record<TemplateKey, ResumeContent> = {
+export const baseSampleResumes: Record<TemplateKey, ResumeContent> = {
   minimal: {
     contact: {
       name: "Michael Lee",
@@ -586,3 +587,33 @@ export const sampleResumes: Record<TemplateKey, ResumeContent> = {
     },
   },
 };
+
+function withExtras(base: ResumeContent, extras: SampleExtras, photo: string): ResumeContent {
+  const experience = base.experience.map((job, i) =>
+    ({
+      ...job,
+      bullets: [
+        ...job.bullets,
+        ...(i === 0 ? (extras.firstJobBullets ?? []) : []),
+        ...(extras.moreBullets?.[i] ?? []),
+      ],
+    })
+  );
+  const optionalSections: Record<string, unknown[]> = { ...base.optionalSections };
+  for (const [key, entries] of Object.entries(extras.optionalSections ?? {})) {
+    optionalSections[key] = [...(optionalSections[key] ?? []), ...(entries as unknown[])];
+  }
+  return {
+    ...base,
+    contact: { ...base.contact, photoDataUrl: base.contact.photoDataUrl ?? photo },
+    experience: [...experience, ...(extras.experience ?? [])],
+    education: [...base.education, ...(extras.education ?? [])],
+    skills: [...base.skills, ...(extras.skills ?? [])],
+    optionalSections: optionalSections as ResumeContent["optionalSections"],
+  };
+}
+
+/** The samples every preview renders: base content plus extras. */
+export const sampleResumes: Record<TemplateKey, ResumeContent> = Object.fromEntries(
+  (Object.keys(baseSampleResumes) as TemplateKey[]).map((key) => [key, withExtras(baseSampleResumes[key], sampleExtras[key], `/samples/${key}.svg`)])
+) as Record<TemplateKey, ResumeContent>;

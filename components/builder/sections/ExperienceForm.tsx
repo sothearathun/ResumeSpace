@@ -7,9 +7,11 @@ import { inputClass, textareaClass } from "../inputStyles";
 export function ExperienceForm({
   experience,
   onChange,
+  onFocusBullets,
 }: {
   experience: ResumeExperience[];
   onChange: (experience: ResumeExperience[]) => void;
+  onFocusBullets: (entryId: string) => void;
 }) {
   function update(id: string, patch: Partial<ResumeExperience>) {
     onChange(experience.map((job) => (job.id === id ? { ...job, ...patch } : job)));
@@ -104,9 +106,14 @@ export function ExperienceForm({
               className={textareaClass}
               value={job.bullets.join("\n")}
               onChange={(e) => update(job.id, { bullets: e.target.value.split("\n") })}
+              onFocus={() => onFocusBullets(job.id)}
               placeholder={"Led design for the onboarding redesign...\nBuilt and maintained the team's design system..."}
             />
           </Field>
+          <p className="-mt-2 text-[12px] text-text-secondary">
+            Tip: use the STAR format — Situation, Task, Action, Result — and include a measurable
+            outcome where you can. Click into a bullet and ask the AI Helper for a hand.
+          </p>
         </div>
       ))}
 

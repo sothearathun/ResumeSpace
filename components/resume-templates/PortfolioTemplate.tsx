@@ -1,5 +1,5 @@
 import type { ResumeAppearance, ResumeContent } from "@/lib/resume/types";
-import { appearanceStyle } from "@/lib/resume/appearance";
+import { appearanceStyle, scaledAvatarSize } from "@/lib/resume/appearance";
 import { optionalSectionsToBlocks } from "@/lib/resume/optional-sections";
 import { Avatar } from "./Avatar";
 
@@ -24,13 +24,13 @@ export function PortfolioTemplate({
 
   return (
     <div className="w-full bg-white text-neutral-900" style={appearanceStyle(appearance)}>
-      <header className="flex items-center gap-6 bg-(--header-bg) px-14 py-12">
+      <header className="flex items-start gap-6 bg-(--header-bg) px-14 py-12">
         {contact.photoDataUrl && (
           <Avatar
             name={contact.name}
             photoDataUrl={contact.photoDataUrl}
             shape={appearance.photoShape}
-            size={96}
+            size={scaledAvatarSize(160, appearance.photoSize)}
             ring
           />
         )}
@@ -41,7 +41,7 @@ export function PortfolioTemplate({
           {contact.jobTitle && (
             <p className="mt-2 text-[1.1em] font-medium text-neutral-800">{contact.jobTitle}</p>
           )}
-          <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[0.85em] text-neutral-600">
+          <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[0.85em] text-(--link)">
             {[contact.email, contact.phone, contact.location, contact.portfolio]
               .filter(Boolean)
               .map((item) => (
@@ -109,7 +109,7 @@ export function PortfolioTemplate({
 
           {skills.length > 0 && (
             <BigSection title="Skills">
-              <p className="text-[0.88em] text-neutral-800">{skills.join(" · ")}</p>
+              <p className="text-[0.88em] text-neutral-800">{skills.filter(Boolean).join(" · ")}</p>
             </BigSection>
           )}
         </div>

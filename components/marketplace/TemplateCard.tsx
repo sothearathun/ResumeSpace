@@ -1,12 +1,13 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import type { TemplateMeta } from "@/lib/resume/types";
-import { TemplatePreview } from "@/components/resume-templates/TemplatePreview";
+import { TemplatePreviewLazy } from "@/components/resume-templates/TemplatePreviewLazy";
 
 export function TemplateCard({ template }: { template: TemplateMeta }) {
   return (
-    <div className="group flex flex-col gap-4">
+    <div className="group flex flex-col gap-4 transition-transform duration-300 hover:-translate-y-1">
       <div className="group relative">
-        <TemplatePreview templateKey={template.key} />
+        <TemplatePreviewLazy templateKey={template.key} />
 
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center gap-2 bg-neutral-900/0 opacity-0 transition-all duration-200 group-hover:bg-neutral-900/35 group-hover:opacity-100">
           <Link
@@ -39,6 +40,13 @@ export function TemplateCard({ template }: { template: TemplateMeta }) {
           )}
         </div>
         <p className="mt-1 text-[13px] text-text-secondary">{template.tagline}</p>
+        <Link
+          href={`/builder?template=${template.key}`}
+          className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-accent/30 px-3.5 py-1.5 text-[13px] font-medium text-accent transition-all hover:border-accent hover:bg-accent hover:text-white"
+        >
+          Use this template
+          <ArrowRight size={14} />
+        </Link>
       </div>
     </div>
   );

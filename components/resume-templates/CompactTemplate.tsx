@@ -1,5 +1,5 @@
 import type { ResumeAppearance, ResumeContent } from "@/lib/resume/types";
-import { appearanceStyle } from "@/lib/resume/appearance";
+import { appearanceStyle, scaledAvatarSize } from "@/lib/resume/appearance";
 import { optionalSectionsToBlocks } from "@/lib/resume/optional-sections";
 import { OptionalSectionBlocks } from "./Section";
 import { Avatar } from "./Avatar";
@@ -25,7 +25,7 @@ export function CompactTemplate({
               name={contact.name}
               photoDataUrl={contact.photoDataUrl}
               shape={appearance.photoShape}
-              size={44}
+              size={scaledAvatarSize(80, appearance.photoSize)}
             />
           )}
           <div>
@@ -93,7 +93,7 @@ export function CompactTemplate({
             <h2 className="mb-1 text-[0.7em] font-semibold tracking-[0.06em] text-(--accent) uppercase">
               Skills
             </h2>
-            <p className="text-[0.78em] text-neutral-800">{skills.join(" · ")}</p>
+            <p className="text-[0.78em] text-neutral-800">{skills.filter(Boolean).join(" · ")}</p>
           </div>
         )}
 

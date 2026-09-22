@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { pageMetadata } from "@/lib/seo";
 import { resumeExamples } from "@/lib/resume-examples/examples";
 import { ExampleCard } from "@/components/resume-examples/ExampleCard";
 
-export const metadata: Metadata = {
-  title: "Resume Examples — ResumeCraft",
-  description: "Real, role-specific resume examples across engineering, design, marketing, academia, and more.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Resume Examples by Job: Engineering, Design, Marketing & More",
+  description:
+    "Free resume examples for real roles across engineering, design, marketing, finance and academia. Copy the structure and build yours with a free resume builder.",
+  path: "/resume-examples",
+  keywords: ["resume examples", "resume samples", "resume examples by job"],
+});
 
 export default function ResumeExamplesPage() {
   return (

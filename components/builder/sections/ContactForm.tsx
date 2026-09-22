@@ -7,18 +7,24 @@ import { inputClass } from "../inputStyles";
 
 type Contact = ResumeDraft["contact"];
 
+const PHOTO_SIZES: NonNullable<ResumeAppearance["photoSize"]>[] = ["small", "medium", "large"];
+
 export function ContactForm({
   contact,
   onChange,
   supportsPhoto,
   photoShape,
   onPhotoShapeChange,
+  photoSize,
+  onPhotoSizeChange,
 }: {
   contact: Contact;
   onChange: (contact: Contact) => void;
   supportsPhoto: boolean;
   photoShape: ResumeAppearance["photoShape"];
   onPhotoShapeChange: (shape: ResumeAppearance["photoShape"]) => void;
+  photoSize: ResumeAppearance["photoSize"];
+  onPhotoSizeChange: (size: ResumeAppearance["photoSize"]) => void;
 }) {
   const [photoError, setPhotoError] = useState<string | null>(null);
 
@@ -47,11 +53,14 @@ export function ContactForm({
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px] font-medium text-text-primary">Photo</span>
           <div className="flex items-center gap-4">
+            {/* Fixed size on purpose — this is a preview of the uploaded
+                photo itself, not of how big it'll appear on the resume, so
+                it shouldn't shrink/grow when the Size control changes. */}
             <Avatar
               name={contact.name || "?"}
               photoDataUrl={contact.photoDataUrl}
               shape={photoShape}
-              size={56}
+              size={64}
             />
             <div className="flex items-center gap-3">
               <label className="cursor-pointer rounded-lg border border-border px-3 py-1.5 text-[13px] font-medium text-text-primary transition-colors hover:bg-bg-secondary">
@@ -91,6 +100,27 @@ export function ContactForm({
                   }`}
                 >
                   {shape}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-[12px] text-text-secondary">Size</span>
+            <div className="flex overflow-hidden rounded-md border border-border">
+              {PHOTO_SIZES.map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  onClick={() => onPhotoSizeChange(size)}
+                  aria-pressed={(photoSize ?? "medium") === size}
+                  className={`px-2.5 py-1 text-[12px] capitalize transition-colors ${
+                    (photoSize ?? "medium") === size
+                      ? "bg-accent text-white"
+                      : "text-text-secondary hover:bg-bg-secondary"
+                  }`}
+                >
+                  {size}
                 </button>
               ))}
             </div>

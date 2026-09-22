@@ -1,5 +1,5 @@
 import type { ResumeAppearance, ResumeContent } from "@/lib/resume/types";
-import { appearanceStyle } from "@/lib/resume/appearance";
+import { appearanceStyle, scaledAvatarSize } from "@/lib/resume/appearance";
 import { optionalSectionsToBlocks } from "@/lib/resume/optional-sections";
 import { Section, OptionalSectionBlocks } from "./Section";
 import { Avatar } from "./Avatar";
@@ -32,7 +32,7 @@ export function ModernTemplate({
       {skills.length > 0 && (
         <Section title="Skills">
           <ul className="flex flex-col gap-1.5 text-[0.85em] text-neutral-800">
-            {skills.map((skill) => (
+            {skills.filter(Boolean).map((skill) => (
               <li key={skill}>{skill}</li>
             ))}
           </ul>
@@ -44,13 +44,13 @@ export function ModernTemplate({
 
   return (
     <div className="w-full bg-white text-neutral-900" style={appearanceStyle(appearance)}>
-      <header className="flex items-center gap-6 bg-(--header-bg) px-14 py-10">
+      <header className="flex items-start gap-6 bg-(--header-bg) px-14 py-10">
         {contact.photoDataUrl && (
           <Avatar
             name={contact.name}
             photoDataUrl={contact.photoDataUrl}
             shape={appearance.photoShape}
-            size={88}
+            size={scaledAvatarSize(150, appearance.photoSize)}
           />
         )}
         <div>
@@ -60,7 +60,7 @@ export function ModernTemplate({
               {contact.jobTitle}
             </p>
           )}
-          <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[0.85em] text-neutral-600">
+          <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[0.85em] text-(--link)">
             {[contact.email, contact.phone, contact.location, contact.linkedin, contact.portfolio]
               .filter(Boolean)
               .map((item) => (

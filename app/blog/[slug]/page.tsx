@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { blogPosts, getBlogPost } from "@/lib/blog/posts";
 import { formatPostDate } from "@/lib/blog/format";
 import { SITE_URL } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
   return blogPosts.map((p) => ({ slug: p.slug }));
@@ -15,12 +16,11 @@ export async function generateMetadata(props: PageProps<"/blog/[slug]">): Promis
   const { slug } = await props.params;
   const post = getBlogPost(slug);
   if (!post) return {};
+  const base = pageMetadata({ title: post.title, description: post.description, path: `/blog/${post.slug}` });
   return {
-    title: `${post.title} — ResumeCraft`,
-    description: post.description,
+    ...base,
     openGraph: {
-      title: post.title,
-      description: post.description,
+      ...base.openGraph,
       type: "article",
       publishedTime: post.publishedAt,
       url: `${SITE_URL}/blog/${post.slug}`,
@@ -39,8 +39,8 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
     headline: post.title,
     description: post.description,
     datePublished: post.publishedAt,
-    author: { "@type": "Organization", name: "ResumeCraft" },
-    publisher: { "@type": "Organization", name: "ResumeCraft" },
+    author: { "@type": "Organization", name: "ResumeSpace" },
+    publisher: { "@type": "Organization", name: "ResumeSpace" },
     mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
   };
 
@@ -74,7 +74,7 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
         <div className="mt-14 flex flex-col items-start gap-3 rounded-xl border border-border bg-bg-secondary p-6">
           <p className="text-[14px] font-medium">Ready to put this into practice?</p>
           <Link
-            href="/templates"
+            href="/builder"
             className="rounded-lg bg-accent px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-accent-hover"
           >
             Create a resume

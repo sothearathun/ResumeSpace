@@ -1,5 +1,5 @@
 import type { ResumeAppearance, ResumeContent } from "@/lib/resume/types";
-import { appearanceStyle } from "@/lib/resume/appearance";
+import { appearanceStyle, scaledAvatarSize } from "@/lib/resume/appearance";
 import { optionalSectionsToBlocks } from "@/lib/resume/optional-sections";
 import { Section, OptionalSectionBlocks } from "./Section";
 import { Avatar } from "./Avatar";
@@ -23,7 +23,7 @@ export function InternationalTemplate({
           name={contact.name}
           photoDataUrl={contact.photoDataUrl}
           shape={appearance.photoShape}
-          size={84}
+          size={scaledAvatarSize(150, appearance.photoSize)}
         />
 
         <div>
@@ -34,7 +34,7 @@ export function InternationalTemplate({
         </div>
 
         <Section title="Contact">
-          <div className="flex flex-col gap-1 text-[0.78em] break-words text-neutral-700">
+          <div className="flex flex-col gap-1 text-[0.78em] break-words text-(--link)">
             {[contact.email, contact.phone, contact.location, contact.linkedin, contact.portfolio]
               .filter(Boolean)
               .map((item) => (
@@ -60,7 +60,7 @@ export function InternationalTemplate({
         {skills.length > 0 && (
           <Section title="Skills">
             <ul className="flex flex-col gap-1.5 text-[0.8em] text-neutral-800">
-              {skills.map((skill) => (
+              {skills.filter(Boolean).map((skill) => (
                 <li key={skill}>{skill}</li>
               ))}
             </ul>

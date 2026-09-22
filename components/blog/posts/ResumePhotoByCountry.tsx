@@ -60,7 +60,7 @@ export function ResumePhotoByCountry() {
       <p>
         Match the photo decision to where you&rsquo;re applying, not to
         where you&rsquo;re from or a single global default. On
-        ResumeCraft, photo support is available on every template, but
+        ResumeSpace, photo support is available on every template, but
         it&rsquo;s off by default on the ones built around US/UK-style
         applications — you can add or remove it per resume depending on
         who&rsquo;s actually going to read it.

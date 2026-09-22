@@ -6,10 +6,11 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      // Builder/master-resume pages are per-device (localStorage-backed),
-      // not content — nothing there is indexable, so keep crawlers out.
-      disallow: ["/builder", "/master-resume"],
+      // Editor drafts, saved resumes and auth pages are per-user or
+      // per-device — nothing there is worth indexing.
+      disallow: ["/builder", "/my-resumes", "/sign-in", "/auth/", "/api/"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

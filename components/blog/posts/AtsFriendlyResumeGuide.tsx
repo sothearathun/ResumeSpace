@@ -58,7 +58,7 @@ export function AtsFriendlyResumeGuide() {
 
       <h2>Where this fits with templates</h2>
       <p>
-        On ResumeCraft, templates carry an ATS-friendly badge when they&rsquo;re
+        On ResumeSpace, templates carry an ATS-friendly badge when they&rsquo;re
         single-column with standard headings — Minimal, Professional,
         Executive, Compact, Technical, Academic CV, and Graduate all qualify.
         Templates with a header band, a persistent sidebar, or a photo —

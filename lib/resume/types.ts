@@ -22,6 +22,12 @@ export type ResumeAppearance = {
   spacing: "compact" | "comfortable" | "spacious";
   layout?: "one-column" | "two-column";
   photoShape?: "circle" | "square";
+  photoSize?: "small" | "medium" | "large";
+  /** Continuous multiplier on top of fontSize/spacing, only ever set by
+   * "Fit to one page" (never exposed as a manual control) — lets it grow
+   * sparse content to fill a page beyond what the three discrete fontSize
+   * steps alone can reach. 1 (or unset) = no extra scaling. */
+  contentScale?: number;
 };
 
 export type ResumeExperience = {
@@ -79,8 +85,19 @@ export type ResumeContent = {
 
 export type ResumeDraft = ResumeContent & {
   id: string;
+  /** User-given label for this draft (e.g. "Product Designer — Google"),
+   * distinct from contact.name — lets someone tell apart multiple tailored
+   * resumes in My Resumes. Falls back to contact.name when unset. */
+  title?: string;
   templateKey: TemplateKey;
+  updatedAt: string;
   appearance: ResumeAppearance;
+  /** Whether the background overflow watcher is allowed to auto-shrink text
+   * to keep this resume on one page. Defaults to true (existing behavior)
+   * when unset. Turning it off lets someone deliberately keep a larger,
+   * more comfortable size and just let content flow onto a second page,
+   * without the app fighting to compress it back down. */
+  autoFitEnabled?: boolean;
   targeting: {
     targetRole?: string;
     jobDescription?: string;
@@ -89,6 +106,9 @@ export type ResumeDraft = ResumeContent & {
   optionalSections: OptionalSections;
   jobMatch?: {
     score: number;
+    /** How many recognizable skills the job description contained. 0 means
+     * the score is meaningless (nothing to compare), not a real 0%. */
+    totalKeywords?: number;
     matchedSkills: string[];
     missingSkills: string[];
     computedAt: string;

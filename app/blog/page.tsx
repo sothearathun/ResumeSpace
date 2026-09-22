@@ -3,12 +3,16 @@ import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { blogPosts } from "@/lib/blog/posts";
+import { pageMetadata } from "@/lib/seo";
 import { formatPostDate } from "@/lib/blog/format";
 
-export const metadata: Metadata = {
-  title: "Blog — ResumeCraft",
-  description: "Practical, specific writing on resumes, ATS systems, and job applications.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Resume Writing Guides: Master Resume, ATS & Tailoring Tips",
+  description:
+    "Practical guides on writing a resume, building a master resume, beating ATS systems and tailoring your resume to a job description.",
+  path: "/blog",
+  keywords: ["resume tips", "master resume guide", "ATS resume guide", "resume writing"],
+});
 
 export default function BlogIndexPage() {
   return (

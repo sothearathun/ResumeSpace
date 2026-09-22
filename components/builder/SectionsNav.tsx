@@ -6,7 +6,7 @@ import type { OptionalSectionKey, OptionalSections } from "@/lib/resume/types";
 import { optionalSectionMeta } from "@/lib/resume/optional-sections";
 
 export type CoreSectionKey = "contact" | "summary" | "experience" | "education" | "skills";
-export type SectionKey = CoreSectionKey | OptionalSectionKey;
+export type SectionKey = CoreSectionKey | OptionalSectionKey | "template" | "appearance";
 
 const coreSections: { key: CoreSectionKey; label: string }[] = [
   { key: "contact", label: "Contact" },
@@ -21,11 +21,15 @@ export function SectionsNav({
   onSelect,
   optionalSections,
   onAddSection,
+  showAppearance = false,
 }: {
   active: SectionKey;
   onSelect: (key: SectionKey) => void;
   optionalSections: OptionalSections;
   onAddSection: (key: OptionalSectionKey) => void;
+  /** The builder shows appearance controls (color, size, spacing, layout);
+   * the Master Resume editor doesn't, since it has no template of its own. */
+  showAppearance?: boolean;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const addedKeys = (Object.keys(optionalSections) as OptionalSectionKey[]).filter(
@@ -54,6 +58,22 @@ export function SectionsNav({
           onClick={() => onSelect(key)}
         />
       ))}
+
+      {showAppearance && (
+        <>
+          <div className="my-2 border-t border-border" />
+          <NavItem
+            label="Template"
+            active={active === "template"}
+            onClick={() => onSelect("template")}
+          />
+          <NavItem
+            label="Appearance"
+            active={active === "appearance"}
+            onClick={() => onSelect("appearance")}
+          />
+        </>
+      )}
 
       {availableToAdd.length > 0 && (
         <div className="relative mt-2">

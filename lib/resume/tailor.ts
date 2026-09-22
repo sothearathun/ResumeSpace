@@ -1,111 +1,83 @@
-import type { ResumeContent, ResumeExperience } from "./types";
+import type { ResumeContent } from "./types";
+import { tokenize, scoreAgainst } from "./keywords";
 
-const STOPWORDS = new Set([
-  "the", "and", "for", "with", "you", "your", "our", "are", "will", "have",
-  "has", "this", "that", "from", "into", "who", "what", "when", "where",
-  "job", "role", "work", "working", "team", "teams", "years", "year", "experience",
-  "ability", "able", "strong", "excellent", "including", "such", "etc", "using",
-  "responsibilities", "requirements", "required", "preferred", "must", "plus",
-  "about", "across", "within", "other", "than", "also", "can", "not", "all",
-  "new", "one", "more", "most", "each", "any", "per", "via",
-]);
+/** What to include in a tailored resume, decided by analysis (AI or the
+ * keyword fallback) and then adjustable by the user before anything is
+ * created. Ids refer to entries in the master resume. */
+export type TailorAnalysis = {
+  summary: string;
+  experience: { id: string; relevance: number; keep: boolean; reason: string; keepBullets: number[] }[];
+  education: { id: string; keep: boolean; reason: string }[];
+  /** Skills to keep, most relevant first. */
+  skills: string[];
+  source: "ai" | "keywords";
+};
 
-function tokenize(text: string): string[] {
-  return (text.toLowerCase().match(/[a-z0-9+#.]+/g) ?? []).filter(
-    (word) => word.length > 2 && !STOPWORDS.has(word)
-  );
-}
-
-function scoreAgainst(text: string, keywords: Set<string>): number {
-  let score = 0;
-  for (const word of tokenize(text)) {
-    if (keywords.has(word)) score += 1;
-  }
-  return score;
-}
+/** The user's final choices, after reviewing the analysis. */
+export type TailorSelection = {
+  summary: string;
+  experience: { id: string; bullets: number[] }[];
+  education: string[];
+  skills: string[];
+};
 
 const MIN_SKILLS = 6;
 const MAX_BULLETS_PER_JOB = 4;
-const MAX_JOBS = 5;
 
-function selectSkills(skills: string[], keywords: Set<string>): string[] {
-  const scored = skills.map((skill) => ({ skill, score: scoreAgainst(skill, keywords) }));
-  const matched = scored.filter((s) => s.score > 0).map((s) => s.skill);
-  const unmatched = scored.filter((s) => s.score === 0).map((s) => s.skill);
-  if (matched.length >= MIN_SKILLS) return matched;
-  return [...matched, ...unmatched.slice(0, MIN_SKILLS - matched.length)];
-}
+/** Offline fallback when the AI analysis isn't available: keeps jobs that
+ * share vocabulary with the target role/job description, drops the rest. */
+export function keywordAnalysis(master: ResumeContent, jobText: string, targetRole?: string): TailorAnalysis {
+  const keywords = new Set(tokenize([targetRole, jobText].filter(Boolean).join(" ")));
 
-function trimBullets(job: ResumeExperience, keywords: Set<string>): ResumeExperience {
-  if (job.bullets.length <= MAX_BULLETS_PER_JOB) return job;
-  const scored = job.bullets.map((bullet) => ({
-    bullet,
-    score: scoreAgainst(bullet, keywords) + scoreAgainst(job.jobTitle, keywords),
+  const jobScores = master.experience.map((job) => ({
+    job,
+    score: scoreAgainst(job.jobTitle, keywords) * 2 + job.bullets.reduce((sum, b) => sum + scoreAgainst(b, keywords), 0),
   }));
-  const topBullets = new Set(
-    [...scored]
-      .sort((a, b) => b.score - a.score)
-      .slice(0, MAX_BULLETS_PER_JOB)
-      .map((s) => s.bullet)
-  );
-  // Keep the original bullet order among the ones selected, rather than
-  // resorting by score — reads more naturally than a shuffled list.
-  return { ...job, bullets: job.bullets.filter((b) => topBullets.has(b)) };
-}
+  const bestScore = Math.max(0, ...jobScores.map((j) => j.score));
+  const noSignal = keywords.size === 0 || bestScore === 0;
 
-function selectExperience(experience: ResumeExperience[], keywords: Set<string>): ResumeExperience[] {
-  let jobs = experience;
-  if (jobs.length > MAX_JOBS) {
-    const scored = experience.map((job, index) => ({
-      index,
-      score:
-        scoreAgainst(job.jobTitle, keywords) +
-        job.bullets.reduce((sum, b) => sum + scoreAgainst(b, keywords), 0),
-    }));
-    const keepIndexes = new Set(
-      [...scored]
-        .sort((a, b) => b.score - a.score)
-        .slice(0, MAX_JOBS)
-        .map((s) => s.index)
-    );
-    // Preserve chronological order among the kept jobs.
-    jobs = experience.filter((_, index) => keepIndexes.has(index));
-  }
-  return jobs.map((job) => trimBullets(job, keywords));
-}
+  const experience = jobScores.map(({ job, score }) => {
+    const bulletScores = job.bullets.map((b, i) => ({ i, score: scoreAgainst(b, keywords) }));
+    const top = [...bulletScores].sort((a, b) => b.score - a.score).slice(0, MAX_BULLETS_PER_JOB);
+    return {
+      id: job.id,
+      relevance: bestScore === 0 ? 50 : Math.round((score / bestScore) * 100),
+      keep: noSignal || score > 0,
+      reason: noSignal ? "" : score > 0 ? "Shares keywords with the role" : "No overlap with the role's keywords",
+      keepBullets: top.map((t) => t.i).sort((a, b) => a - b),
+    };
+  });
 
-export type TailorResult = {
-  content: ResumeContent;
-  matchedSkills: string[];
-  missingKeywords: string[];
-};
-
-/** Selects and reorders the most relevant parts of a master resume for a
- * given job description, using keyword overlap — not generative rewriting.
- * Every word in the result already existed in the master resume; this only
- * decides what to keep, trim, and prioritize. */
-export function tailorContentToJob(master: ResumeContent, jobText: string, targetRole?: string): TailorResult {
-  const keywordSource = [targetRole, jobText].filter(Boolean).join(" ");
-  const keywords = new Set(tokenize(keywordSource));
-
-  if (keywords.size === 0) {
-    return { content: structuredClone(master), matchedSkills: [], missingKeywords: [] };
-  }
-
-  const skills = selectSkills(master.skills, keywords);
-  const experience = selectExperience(master.experience, keywords);
-
-  const matchedSkills = master.skills.filter((skill) => scoreAgainst(skill, keywords) > 0);
-
-  const mentioned = new Set(
-    [...master.skills, ...master.experience.flatMap((j) => j.bullets), master.summary]
-      .flatMap((text) => tokenize(text))
-  );
-  const missingKeywords = [...keywords].filter((k) => !mentioned.has(k)).slice(0, 8);
+  const scoredSkills = master.skills.map((skill) => ({ skill, score: scoreAgainst(skill, keywords) }));
+  const matched = scoredSkills.filter((s) => s.score > 0).map((s) => s.skill);
+  const rest = scoredSkills.filter((s) => s.score === 0).map((s) => s.skill);
+  const skills = matched.length >= MIN_SKILLS ? matched : [...matched, ...rest.slice(0, MIN_SKILLS - matched.length)];
 
   return {
-    content: { ...structuredClone(master), skills, experience },
-    matchedSkills,
-    missingKeywords,
+    summary: master.summary,
+    experience,
+    education: master.education.map((edu) => ({ id: edu.id, keep: true, reason: "" })),
+    skills,
+    source: "keywords",
+  };
+}
+
+/** Builds resume content from the master resume using only what the user
+ * kept. Entries stay in their original order; skills follow the selection's
+ * order (most relevant first). */
+export function buildTailoredContent(master: ResumeContent, selection: TailorSelection): ResumeContent {
+  const clone = structuredClone(master);
+  const bulletsByJob = new Map(selection.experience.map((e) => [e.id, new Set(e.bullets)]));
+  const eduKeep = new Set(selection.education);
+  const masterSkills = new Set(master.skills);
+
+  return {
+    ...clone,
+    summary: selection.summary,
+    experience: clone.experience
+      .filter((job) => bulletsByJob.has(job.id))
+      .map((job) => ({ ...job, bullets: job.bullets.filter((_, i) => bulletsByJob.get(job.id)!.has(i)) })),
+    education: clone.education.filter((edu) => eduKeep.has(edu.id)),
+    skills: selection.skills.filter((skill) => masterSkills.has(skill)),
   };
 }

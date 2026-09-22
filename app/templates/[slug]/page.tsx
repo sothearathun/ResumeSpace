@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { TemplatePreview } from "@/components/resume-templates/TemplatePreview";
+import { pageMetadata } from "@/lib/seo";
+import { TemplatePreviewLazy } from "@/components/resume-templates/TemplatePreviewLazy";
 import { getTemplateMeta, templateCatalog } from "@/components/resume-templates/catalog";
 
 export function generateStaticParams() {
@@ -16,10 +17,12 @@ export async function generateMetadata(
   const { slug } = await props.params;
   const template = getTemplateMeta(slug);
   if (!template) return {};
-  return {
-    title: `${template.name} template — ResumeCraft`,
-    description: template.description,
-  };
+  return pageMetadata({
+    title: `${template.name} Resume Template (Free${template.atsFriendly ? ", ATS-Friendly" : ""})`,
+    description: `${template.description} Free to use — customize it online and download as a PDF.`,
+    path: `/templates/${template.key}`,
+    keywords: [`${template.name.toLowerCase()} resume template`, "free resume template"],
+  });
 }
 
 export default async function TemplatePreviewPage(props: PageProps<"/templates/[slug]">) {
@@ -33,7 +36,7 @@ export default async function TemplatePreviewPage(props: PageProps<"/templates/[
 
       <section className="mx-auto w-full max-w-[1280px] px-4 pt-10 pb-24 sm:px-6 lg:px-10">
         <Link
-          href="/templates"
+          href="/#templates"
           className="text-[13px] text-text-secondary hover:text-text-primary"
         >
           ← Back to templates
@@ -41,7 +44,7 @@ export default async function TemplatePreviewPage(props: PageProps<"/templates/[
 
         <div className="mt-6 grid grid-cols-1 gap-12 lg:grid-cols-[1fr_320px]">
           <div className="mx-auto w-full max-w-[600px]">
-            <TemplatePreview templateKey={template.key} />
+            <TemplatePreviewLazy templateKey={template.key} />
           </div>
 
           <div className="flex flex-col gap-6 lg:pt-4">

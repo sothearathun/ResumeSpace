@@ -3,11 +3,13 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Pricing — ResumeCraft",
-  description: "Free to build. Pay only when you need more than one resume.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Pricing: Free Resume Builder with Optional Extras",
+  description: "Build and download your resume for free. Pay only if you want extra AI tailoring or premium templates.",
+  path: "/pricing",
+});
 
 const plans = [
   {
@@ -108,14 +110,14 @@ export default function PricingPage() {
           <p className="mt-1.5 max-w-2xl text-[13.5px] leading-relaxed text-text-secondary">
             You&rsquo;ll be able to watch one or two short ads to earn a single
             generation credit, no purchase needed. This depends on an ad
-            network we haven&rsquo;t connected yet — it needs ResumeCraft to be
+            network we haven&rsquo;t connected yet — it needs ResumeSpace to be
             live at a real domain before an ad provider will approve it, so
             it&rsquo;s coming after checkout, not before.
           </p>
         </div>
 
         <p className="mt-6 text-[13px] text-text-secondary">
-          Checkout isn&rsquo;t live yet — everything on ResumeCraft is free to
+          Checkout isn&rsquo;t live yet — everything on ResumeSpace is free to
           use while this is in progress. Creating an account now reserves your
           spot for when it is.
         </p>

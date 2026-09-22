@@ -1,5 +1,5 @@
 import type { ResumeAppearance, ResumeContent } from "@/lib/resume/types";
-import { appearanceStyle } from "@/lib/resume/appearance";
+import { appearanceStyle, scaledAvatarSize } from "@/lib/resume/appearance";
 import { optionalSectionsToBlocks } from "@/lib/resume/optional-sections";
 import { Section, OptionalSectionBlocks } from "./Section";
 import { Avatar } from "./Avatar";
@@ -25,7 +25,7 @@ export function ExecutiveTemplate({
               name={contact.name}
               photoDataUrl={contact.photoDataUrl}
               shape={appearance.photoShape ?? "square"}
-              size={76}
+              size={scaledAvatarSize(135, appearance.photoSize)}
             />
           </div>
         )}
@@ -94,7 +94,7 @@ export function ExecutiveTemplate({
 
         {skills.length > 0 && (
           <Section title="Areas of Expertise" tone="centered">
-            <p className="text-center text-[0.88em] text-neutral-800">{skills.join(" · ")}</p>
+            <p className="text-center text-[0.88em] text-neutral-800">{skills.filter(Boolean).join(" · ")}</p>
           </Section>
         )}
 

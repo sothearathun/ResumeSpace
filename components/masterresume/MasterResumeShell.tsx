@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import type { OptionalSectionKey, ResumeContent } from "@/lib/resume/types";
 import { getOrCreateMasterResume, saveMasterResume, type MasterResumeRecord } from "@/lib/resume/masterResumeStore";
+import type { ActiveField } from "@/lib/ai/activeField";
 import { SectionsNav, type SectionKey } from "@/components/builder/SectionsNav";
+import { AiHelper } from "@/components/builder/AiHelper";
 import { ContactForm } from "@/components/builder/sections/ContactForm";
 import { SummaryForm } from "@/components/builder/sections/SummaryForm";
 import { ExperienceForm } from "@/components/builder/sections/ExperienceForm";
@@ -18,6 +20,7 @@ export function MasterResumeShell() {
   // synchronously as initial state is safe — same pattern as BuilderShell.
   const [record, setRecord] = useState<MasterResumeRecord>(() => getOrCreateMasterResume());
   const [activeSection, setActiveSection] = useState<SectionKey>("contact");
+  const [activeField, setActiveField] = useState<ActiveField | null>(null);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -47,7 +50,7 @@ export function MasterResumeShell() {
         </p>
       </div>
 
-      <div className="grid flex-1 grid-cols-1 lg:grid-cols-[200px_minmax(0,1fr)_360px]">
+      <div className="grid flex-1 grid-cols-1 lg:grid-cols-[200px_minmax(0,1fr)_minmax(460px,42%)]">
         <div className="border-b border-border lg:border-r lg:border-b-0">
           <SectionsNav
             active={activeSection}
@@ -69,6 +72,9 @@ export function MasterResumeShell() {
             update={updateContent}
             photoShape={record.photoShape}
             onPhotoShapeChange={(photoShape) => setRecord((r) => ({ ...r, photoShape }))}
+            photoSize={record.photoSize}
+            onPhotoSizeChange={(photoSize) => setRecord((r) => ({ ...r, photoSize }))}
+            onFocusField={setActiveField}
           />
         </div>
 
@@ -76,6 +82,14 @@ export function MasterResumeShell() {
           <GeneratePanel masterContent={content} />
         </div>
       </div>
+
+      <AiHelper
+        content={content}
+        activeField={activeField}
+        onApply={updateContent}
+        jobTitle={content.contact.jobTitle}
+        company={content.experience[0]?.company}
+      />
     </div>
   );
 }
@@ -86,12 +100,18 @@ function SectionEditor({
   update,
   photoShape,
   onPhotoShapeChange,
+  photoSize,
+  onPhotoSizeChange,
+  onFocusField,
 }: {
   content: ResumeContent;
   activeSection: SectionKey;
   update: (patch: Partial<ResumeContent>) => void;
   photoShape: "circle" | "square" | undefined;
   onPhotoShapeChange: (shape: "circle" | "square" | undefined) => void;
+  photoSize: "small" | "medium" | "large" | undefined;
+  onPhotoSizeChange: (size: "small" | "medium" | "large" | undefined) => void;
+  onFocusField: (field: ActiveField) => void;
 }) {
   switch (activeSection) {
     case "contact":
@@ -102,15 +122,24 @@ function SectionEditor({
           supportsPhoto
           photoShape={photoShape}
           onPhotoShapeChange={onPhotoShapeChange}
+          photoSize={photoSize}
+          onPhotoSizeChange={onPhotoSizeChange}
         />
       );
     case "summary":
-      return <SummaryForm summary={content.summary} onChange={(summary) => update({ summary })} />;
+      return (
+        <SummaryForm
+          summary={content.summary}
+          onChange={(summary) => update({ summary })}
+          onFocus={() => onFocusField({ kind: "summary" })}
+        />
+      );
     case "experience":
       return (
         <ExperienceForm
           experience={content.experience}
           onChange={(experience) => update({ experience })}
+          onFocusBullets={(entryId) => onFocusField({ kind: "experience-bullets", entryId })}
         />
       );
     case "education":
@@ -118,7 +147,13 @@ function SectionEditor({
         <EducationForm education={content.education} onChange={(education) => update({ education })} />
       );
     case "skills":
-      return <SkillsForm skills={content.skills} onChange={(skills) => update({ skills })} />;
+      return (
+        <SkillsForm
+          skills={content.skills}
+          onChange={(skills) => update({ skills })}
+          onFocus={() => onFocusField({ kind: "skills" })}
+        />
+      );
     default: {
       const key = activeSection as OptionalSectionKey;
       return (
@@ -129,6 +164,9 @@ function SectionEditor({
             update({
               optionalSections: { ...content.optionalSections, [key]: entries },
             })
+          }
+          onFocusField={(entryId, fieldKey) =>
+            onFocusField({ kind: "optional-field", sectionKey: key, entryId, fieldKey })
           }
         />
       );

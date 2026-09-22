@@ -5,6 +5,7 @@ const STORAGE_KEY = "resumecraft:masterResume";
 export type MasterResumeRecord = {
   content: ResumeContent;
   photoShape?: "circle" | "square";
+  photoSize?: "small" | "medium" | "large";
 };
 
 function emptyContent(): ResumeContent {
