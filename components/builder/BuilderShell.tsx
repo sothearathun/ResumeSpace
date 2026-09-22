@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import type { OptionalSectionKey, ResumeAppearance, ResumeDraft } from "@/lib/resume/types";
-import { getDraft, saveDraft } from "@/lib/resume/store";
+import { loadDraft, persistDraft } from "@/lib/resume/resumeService";
+import { createClient } from "@/lib/supabase/client";
 import { getTemplateMeta } from "@/components/resume-templates/catalog";
 import type { ActiveField } from "@/lib/ai/activeField";
 import { fetchCheckOverflow, fetchFitToPage, type FitToPageResult } from "@/lib/builder/fitToPage";
@@ -23,9 +24,10 @@ import { ChangeTemplateForm } from "./sections/ChangeTemplateForm";
 import { AppearanceForm } from "./sections/AppearanceForm";
 
 export function BuilderShell({ draftId }: { draftId: string }) {
-  // Loaded via BuilderShellLoader (ssr: false), so this only ever runs
-  // client-side — safe to read localStorage synchronously as initial state.
-  const [draft, setDraft] = useState<ResumeDraft | null>(() => getDraft(draftId) ?? null);
+  // Loaded via BuilderShellLoader (ssr: false). undefined = still loading,
+  // null = no such draft (signed-in account or this device's storage).
+  const [draft, setDraft] = useState<ResumeDraft | null | undefined>(undefined);
+  const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [activeSection, setActiveSection] = useState<SectionKey>("contact");
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving">("saved");
   const [activeField, setActiveField] = useState<ActiveField | null>(null);
@@ -36,10 +38,29 @@ export function BuilderShell({ draftId }: { draftId: string }) {
   const autoFitTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    loadDraft(draftId).then((loaded) => {
+      if (!cancelled) setDraft(loaded);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [draftId]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setSignedIn(Boolean(data.user)));
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSignedIn(Boolean(session?.user));
+    });
+    return () => subscription.subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
     if (!draft) return;
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
-    saveTimeout.current = setTimeout(() => {
-      saveDraft(draft);
+    saveTimeout.current = setTimeout(async () => {
+      await persistDraft(draft);
       setSaveStatus("saved");
     }, 300);
     return () => {
@@ -129,18 +150,34 @@ export function BuilderShell({ draftId }: { draftId: string }) {
     setFitMessage(null);
   }
 
+  if (draft === undefined) {
+    return (
+      <div className="flex flex-1 flex-col">
+        <Header />
+        <div className="flex flex-1 items-center justify-center">
+          <p className="text-[14px] text-text-secondary">Loading your resume…</p>
+        </div>
+      </div>
+    );
+  }
+
   if (draft === null) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-center">
-        <p className="text-[14px] text-text-secondary">
-          We couldn&rsquo;t find that resume on this device.
-        </p>
-        <Link
-          href="/builder"
-          className="rounded-lg border border-border px-4 py-2 text-[14px] font-medium text-text-primary transition-colors hover:bg-bg-secondary"
-        >
-          Start a new resume
-        </Link>
+      <div className="flex flex-1 flex-col">
+        <Header />
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-center">
+          <p className="text-[14px] text-text-secondary">
+            {signedIn
+              ? "We couldn't find that resume in your account."
+              : "We couldn't find that resume on this device."}
+          </p>
+          <Link
+            href="/builder"
+            className="rounded-lg border border-border px-4 py-2 text-[14px] font-medium text-text-primary transition-colors hover:bg-bg-secondary"
+          >
+            Start a new resume
+          </Link>
+        </div>
       </div>
     );
   }
@@ -150,12 +187,22 @@ export function BuilderShell({ draftId }: { draftId: string }) {
       <Header />
 
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-border px-6 py-2 lg:px-10">
-        <InlineEditableTitle
-          value={draft.title ?? ""}
-          placeholder={draft.contact.name || "Untitled resume"}
-          onChange={(title) => update({ title })}
-          className="text-[14px] font-medium text-text-primary"
-        />
+        <div className="flex min-w-0 items-center gap-3">
+          <InlineEditableTitle
+            value={draft.title ?? ""}
+            placeholder={draft.contact.name || "Untitled resume"}
+            onChange={(title) => update({ title })}
+            className="text-[14px] font-medium text-text-primary"
+          />
+          {signedIn === false && (
+            <Link
+              href="/sign-in"
+              className="shrink-0 text-[12px] font-medium text-accent hover:text-accent-hover"
+            >
+              Sign in to save this permanently →
+            </Link>
+          )}
+        </div>
         <PreviewToolbar
           draft={draft}
           saveStatus={saveStatus}

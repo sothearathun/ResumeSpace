@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import { migrateLocalDataToAccount } from "@/lib/resume/resumeService";
 import { UserMenu } from "./UserMenu";
 
 const navLinks = [
@@ -23,8 +24,14 @@ export function Header({ statusText }: { statusText?: string }) {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      // Fires right after a magic-link click or Google sign-in completes —
+      // the moment to upload whatever this browser built anonymously into
+      // the account that just signed in.
+      if (event === "SIGNED_IN" && session?.user) {
+        migrateLocalDataToAccount(session.user.id).catch(() => {});
+      }
     });
     return () => subscription.subscription.unsubscribe();
   }, []);

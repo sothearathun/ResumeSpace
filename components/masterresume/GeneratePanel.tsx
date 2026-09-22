@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ResumeContent, TemplateKey } from "@/lib/resume/types";
 import { templateCatalog } from "@/components/resume-templates/catalog";
-import { createDraft } from "@/lib/resume/store";
+import { startDraft } from "@/lib/resume/resumeService";
 import {
   buildTailoredContent,
   keywordAnalysis,
@@ -79,6 +79,7 @@ export function GeneratePanel({ masterContent }: { masterContent: ResumeContent 
   const [templateKey, setTemplateKey] = useState<TemplateKey>("minimal");
   const [analyzing, setAnalyzing] = useState(false);
   const [review, setReview] = useState<Review | null>(null);
+  const [creating, setCreating] = useState(false);
 
   const isEmpty = !masterContent.contact.name && masterContent.experience.length === 0;
 
@@ -103,8 +104,9 @@ export function GeneratePanel({ masterContent }: { masterContent: ResumeContent 
     setAnalyzing(false);
   }
 
-  function handleCreate() {
+  async function handleCreate() {
     if (!review) return;
+    setCreating(true);
     const content = buildTailoredContent(masterContent, {
       summary: review.summary,
       experience: masterContent.experience
@@ -121,7 +123,10 @@ export function GeneratePanel({ masterContent }: { masterContent: ResumeContent 
         ...masterContent.skills.filter((s) => review.skillKeep[s] && !review.analysis.skills.includes(s)),
       ],
     });
-    const draft = createDraft(templateKey, content, { targetRole, jobDescription });
+    // Master Resume is account-only (see MasterResumeShell's sign-in gate),
+    // so this is always a signed-in user — startDraft saves it straight to
+    // their account rather than this device's localStorage.
+    const draft = await startDraft(templateKey, content, { targetRole, jobDescription });
     router.push(`/builder/${draft.id}`);
   }
 
@@ -262,9 +267,10 @@ export function GeneratePanel({ masterContent }: { masterContent: ResumeContent 
             <button
               type="button"
               onClick={handleCreate}
-              className="rounded-lg bg-accent px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-accent-hover"
+              disabled={creating}
+              className="rounded-lg bg-accent px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-60"
             >
-              Create resume
+              {creating ? "Creating…" : "Create resume"}
             </button>
             <button
               type="button"

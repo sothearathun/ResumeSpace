@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import type { OptionalSectionKey, ResumeContent } from "@/lib/resume/types";
-import { getOrCreateMasterResume, saveMasterResume, type MasterResumeRecord } from "@/lib/resume/masterResumeStore";
+import type { MasterResumeRecord } from "@/lib/resume/masterResumeStore";
+import { getCurrentUserId, loadMasterResume, persistMasterResume } from "@/lib/resume/resumeService";
 import type { ActiveField } from "@/lib/ai/activeField";
 import { SectionsNav, type SectionKey } from "@/components/builder/SectionsNav";
 import { AiHelper } from "@/components/builder/AiHelper";
@@ -15,24 +17,85 @@ import { SkillsForm } from "@/components/builder/sections/SkillsForm";
 import { OptionalSectionForm } from "@/components/builder/sections/OptionalSectionForm";
 import { GeneratePanel } from "./GeneratePanel";
 
+function emptyContent(): ResumeContent {
+  return { contact: { name: "", email: "" }, summary: "", experience: [], education: [], skills: [], optionalSections: {} };
+}
+
 export function MasterResumeShell() {
-  // "use client"-only route (see MasterResumePage), so reading localStorage
-  // synchronously as initial state is safe — same pattern as BuilderShell.
-  const [record, setRecord] = useState<MasterResumeRecord>(() => getOrCreateMasterResume());
+  // The master resume only makes sense as a durable, cross-device document —
+  // it exists to be built up once and reused, so it's account-only (see
+  // resumeService: no localStorage fallback for it, unlike single resumes).
+  const [userId, setUserId] = useState<string | null | undefined>(undefined);
+  const [record, setRecord] = useState<MasterResumeRecord | undefined>(undefined);
   const [activeSection, setActiveSection] = useState<SectionKey>("contact");
   const [activeField, setActiveField] = useState<ActiveField | null>(null);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    getCurrentUserId().then((id) => {
+      setUserId(id);
+      if (!id) return;
+      loadMasterResume().then((loaded) => setRecord(loaded ?? { content: emptyContent() }));
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!userId || !record) return;
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
-    saveTimeout.current = setTimeout(() => saveMasterResume(record), 300);
+    saveTimeout.current = setTimeout(() => {
+      persistMasterResume(userId, record);
+    }, 300);
     return () => {
       if (saveTimeout.current) clearTimeout(saveTimeout.current);
     };
-  }, [record]);
+  }, [userId, record]);
 
   function updateContent(patch: Partial<ResumeContent>) {
-    setRecord((r) => ({ ...r, content: { ...r.content, ...patch } }));
+    setRecord((r) => (r ? { ...r, content: { ...r.content, ...patch } } : r));
+  }
+
+  if (userId === undefined) {
+    return (
+      <div className="flex flex-1 flex-col">
+        <Header />
+        <div className="flex flex-1 items-center justify-center">
+          <p className="text-[14px] text-text-secondary">Loading…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (userId === null) {
+    return (
+      <div className="flex flex-1 flex-col">
+        <Header />
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-center">
+          <h1 className="text-[22px] font-semibold tracking-tight">Sign in to build your master resume</h1>
+          <p className="max-w-md text-[14px] leading-relaxed text-text-secondary">
+            Your master resume is your full career history, kept in one place and reused to generate
+            tailored resumes for every job. It&rsquo;s saved to your account so it&rsquo;s there whenever you
+            come back, on any device.
+          </p>
+          <Link
+            href="/sign-in"
+            className="rounded-lg bg-accent px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-accent-hover"
+          >
+            Sign in
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!record) {
+    return (
+      <div className="flex flex-1 flex-col">
+        <Header />
+        <div className="flex flex-1 items-center justify-center">
+          <p className="text-[14px] text-text-secondary">Loading your master resume…</p>
+        </div>
+      </div>
+    );
   }
 
   const { content } = record;
@@ -71,9 +134,9 @@ export function MasterResumeShell() {
             activeSection={activeSection}
             update={updateContent}
             photoShape={record.photoShape}
-            onPhotoShapeChange={(photoShape) => setRecord((r) => ({ ...r, photoShape }))}
+            onPhotoShapeChange={(photoShape) => setRecord((r) => (r ? { ...r, photoShape } : r))}
             photoSize={record.photoSize}
-            onPhotoSizeChange={(photoSize) => setRecord((r) => ({ ...r, photoSize }))}
+            onPhotoSizeChange={(photoSize) => setRecord((r) => (r ? { ...r, photoSize } : r))}
             onFocusField={setActiveField}
           />
         </div>

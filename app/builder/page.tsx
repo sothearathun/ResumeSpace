@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/Header";
-import { createDraft } from "@/lib/resume/store";
+import { startDraft } from "@/lib/resume/resumeService";
 import { getTemplateMeta } from "@/components/resume-templates/catalog";
 import type { TemplateKey } from "@/lib/resume/types";
 
@@ -21,8 +21,9 @@ function RedirectToNewDraft() {
     hasCreatedDraft.current = true;
     const requested = searchParams.get("template");
     const templateKey = (getTemplateMeta(requested ?? "")?.key ?? DEFAULT_TEMPLATE) as TemplateKey;
-    const draft = createDraft(templateKey);
-    router.replace(`/builder/${draft.id}`);
+    // Signed in -> saved straight to their account; signed out -> this
+    // browser's localStorage, same as before (see resumeService).
+    startDraft(templateKey).then((draft) => router.replace(`/builder/${draft.id}`));
   }, [router, searchParams]);
 
   return null;
