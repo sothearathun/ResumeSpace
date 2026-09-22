@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import { SITE_URL } from "@/lib/site";
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, KEYWORDS, SITE_NAME } from "@/lib/seo";
 import { FeedbackButton } from "@/components/feedback/FeedbackButton";
@@ -61,6 +62,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-bg text-text-primary font-sans">
         {children}
         <FeedbackButton />
+        {/* beforeInteractive so the raw HTML always has this in <head> — both
+            for AdSense's site-ownership verification and for the ad script
+            itself to load as early as Next allows. */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1317984984029392"
+          crossOrigin="anonymous"
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );
