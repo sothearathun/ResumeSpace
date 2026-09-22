@@ -52,8 +52,16 @@ export function Footer() {
         </nav>
       </div>
       <div className="border-t border-border">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-4 py-5 text-[12px] text-text-secondary sm:px-6 lg:px-10">
+        <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-5 text-[12px] text-text-secondary sm:px-6 lg:px-10">
           <span>© {new Date().getFullYear()} ResumeSpace. Free to use.</span>
+          <div className="flex items-center gap-5">
+            <Link href="/privacy" className="hover:text-text-primary">
+              Privacy
+            </Link>
+            <Link href="/terms" className="hover:text-text-primary">
+              Terms
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

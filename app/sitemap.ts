@@ -11,6 +11,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/blog`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${SITE_URL}/resume-examples`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/pricing`, changeFrequency: "monthly", priority: 0.3 },
+    { url: `${SITE_URL}/privacy`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/terms`, changeFrequency: "yearly", priority: 0.2 },
   ];
 
   const landingRoutes: MetadataRoute.Sitemap = seoPages.map((p) => ({
