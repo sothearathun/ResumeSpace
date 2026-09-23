@@ -23,7 +23,7 @@ export default function PrivacyPage() {
           <p>
             This page explains what ResumeSpace collects, why, and how to control it. It&rsquo;s written in
             plain language on purpose. If anything here is unclear, use the Feedback button on the site or
-            email <a href="mailto:thunsotheara01@gmail.com" className="text-accent hover:text-accent-hover">thunsotheara01@gmail.com</a>.
+            email <a href="mailto:support@resumespace.site" className="text-accent hover:text-accent-hover">support@resumespace.site</a>.
           </p>
 
           <section>
@@ -126,7 +126,7 @@ export default function PrivacyPage() {
               <li>You can sign out at any time from the account menu.</li>
               <li>
                 To delete your account and everything tied to it (resumes, master resume, feedback), email{" "}
-                <a href="mailto:thunsotheara01@gmail.com" className="text-accent hover:text-accent-hover">thunsotheara01@gmail.com</a>{" "}
+                <a href="mailto:support@resumespace.site" className="text-accent hover:text-accent-hover">support@resumespace.site</a>{" "}
                 and we&rsquo;ll remove it.
               </li>
               <li>If you never sign in, clearing your browser&rsquo;s site data removes everything, since nothing was stored elsewhere.</li>

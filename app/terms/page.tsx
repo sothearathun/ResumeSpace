@@ -8,7 +8,7 @@ export const metadata = pageMetadata({
   path: "/terms",
 });
 
-const LAST_UPDATED = "September 22, 2026";
+const LAST_UPDATED = "September 23, 2026";
 
 export default function TermsPage() {
   return (
@@ -23,7 +23,7 @@ export default function TermsPage() {
           <p>
             These are the terms for using ResumeSpace. By using the site, you agree to them. If you have
             questions, use the Feedback button or email{" "}
-            <a href="mailto:thunsotheara01@gmail.com" className="text-accent hover:text-accent-hover">thunsotheara01@gmail.com</a>.
+            <a href="mailto:support@resumespace.site" className="text-accent hover:text-accent-hover">support@resumespace.site</a>.
           </p>
 
           <section>
