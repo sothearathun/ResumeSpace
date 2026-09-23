@@ -1,8 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
+import { enforceRateLimit, LIMITS } from "@/lib/apiGuard";
 
 const KINDS = ["bug", "idea", "other"] as const;
 
 export async function POST(request: Request) {
+  const limited = await enforceRateLimit(request, LIMITS.feedback);
+  if (limited) return limited;
+
   let body: { kind?: string; message?: string; email?: string; path?: string };
   try {
     body = await request.json();

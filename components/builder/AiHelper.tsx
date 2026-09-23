@@ -96,6 +96,10 @@ export function AiHelper({
           },
         }),
       });
+      if (res.status === 429) {
+        setError("You've reached the hourly limit for the AI assistant — please try again a little later.");
+        return;
+      }
       if (!res.ok) throw new Error("Request failed");
       const { reply, updatedText } = await res.json();
       setMessages((m) => [...m, { role: "assistant", content: reply }]);

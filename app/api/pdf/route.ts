@@ -1,5 +1,6 @@
 import type { ResumeDraft } from "@/lib/resume/types";
 import { renderResumePdf } from "@/lib/pdf/renderResumePdf";
+import { draftTooLarge, enforceRateLimit, LIMITS, tooLarge } from "@/lib/apiGuard";
 
 function filenameFor(draft: ResumeDraft): string {
   const base = draft.contact.name.trim().replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "");
@@ -7,6 +8,9 @@ function filenameFor(draft: ResumeDraft): string {
 }
 
 export async function POST(request: Request) {
+  const limited = await enforceRateLimit(request, LIMITS.pdf);
+  if (limited) return limited;
+
   let draft: ResumeDraft;
   try {
     draft = await request.json();
@@ -14,9 +18,10 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  if (!draft || typeof draft !== "object" || !draft.templateKey) {
+  if (!draft || typeof draft !== "object" || !draft.templateKey || !draft.contact) {
     return Response.json({ error: "Missing or invalid resume draft" }, { status: 400 });
   }
+  if (draftTooLarge(draft)) return tooLarge();
 
   try {
     const buffer = await renderResumePdf(draft);

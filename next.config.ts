@@ -5,6 +5,21 @@ const nextConfig: NextConfig = {
     // The template gallery lives on the landing page now.
     return [{ source: "/templates", destination: "/#templates", permanent: true }];
   },
+  async headers() {
+    // Deliberately no Content-Security-Policy: AdSense loads scripts and frames
+    // from many Google domains, and a wrong CSP would silently break ads.
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
