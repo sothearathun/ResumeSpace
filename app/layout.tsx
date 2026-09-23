@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "@/lib/site";
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, KEYWORDS, SITE_NAME } from "@/lib/seo";
 import { FeedbackButton } from "@/components/feedback/FeedbackButton";
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-bg text-text-primary font-sans">
         {children}
         <FeedbackButton />
+        <Analytics />
       </body>
     </html>
   );

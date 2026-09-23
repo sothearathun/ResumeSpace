@@ -8,7 +8,7 @@ export const metadata = pageMetadata({
   path: "/privacy",
 });
 
-const LAST_UPDATED = "September 22, 2026";
+const LAST_UPDATED = "September 23, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -83,10 +83,28 @@ export default function PrivacyPage() {
           </section>
 
           <section>
+            <h2 className="text-[19px] font-semibold">Analytics and ads</h2>
+            <p className="mt-3 text-text-secondary">
+              We use Vercel Analytics to count page views and visitors. It doesn&rsquo;t use cookies and
+              doesn&rsquo;t track you individually — it reports anonymous, aggregated numbers like how many
+              people visited a page, not who they were.
+            </p>
+            <p className="mt-3 text-text-secondary">
+              This site also works with Google AdSense to show ads, which helps keep it free. Once ads are
+              running, Google may set cookies and use data about your visit to show relevant ads, including
+              to comply with consent requirements in the EEA, UK, and Switzerland. You can see and control
+              how Google uses this at{" "}
+              <a href="https://adssettings.google.com" target="_blank" rel="noreferrer" className="text-accent hover:text-accent-hover">
+                adssettings.google.com
+              </a>
+              .
+            </p>
+          </section>
+
+          <section>
             <h2 className="text-[19px] font-semibold">What we don&rsquo;t do</h2>
             <ul className="mt-3 list-disc space-y-1.5 pl-5 text-text-secondary">
-              <li>We don&rsquo;t run any analytics or advertising trackers on this site.</li>
-              <li>We don&rsquo;t sell or share your data with data brokers or advertisers.</li>
+              <li>We don&rsquo;t sell or share your resume content with data brokers or advertisers.</li>
               <li>We don&rsquo;t send your resume anywhere except to generate your own PDF or, when you use an AI feature, to DeepSeek as described above.</li>
               <li>Payments aren&rsquo;t live yet — we don&rsquo;t currently process or store any billing information.</li>
             </ul>
@@ -95,8 +113,9 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-[19px] font-semibold">Cookies</h2>
             <p className="mt-3 text-text-secondary">
-              If you sign in, we use a cookie set by Supabase to keep you signed in. We don&rsquo;t use
-              third-party advertising or tracking cookies.
+              If you sign in, we use a cookie set by Supabase to keep you signed in. Vercel Analytics
+              doesn&rsquo;t use cookies. Google AdSense may set advertising cookies once ads are running, as
+              described above.
             </p>
           </section>
 
