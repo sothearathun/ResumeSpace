@@ -1,6 +1,7 @@
 import type { ResumeAppearance, ResumeDraft } from "@/lib/resume/types";
 import { renderResumePdf } from "@/lib/pdf/renderResumePdf";
 import { countPdfPages } from "@/lib/pdf/countPdfPages";
+import { draftTooLarge, enforceRateLimit, LIMITS, tooLarge } from "@/lib/apiGuard";
 
 const FONT_SIZES: ResumeAppearance["fontSize"][] = ["small", "medium", "large"];
 const SPACINGS: ResumeAppearance["spacing"][] = ["compact", "comfortable", "spacious"];
@@ -30,6 +31,9 @@ async function pageCountFor(draft: ResumeDraft, appearance: ResumeAppearance): P
 }
 
 export async function POST(request: Request) {
+  const limited = await enforceRateLimit(request, LIMITS.fitToPage);
+  if (limited) return limited;
+
   let draft: ResumeDraft;
   try {
     draft = await request.json();
@@ -37,9 +41,10 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  if (!draft || typeof draft !== "object" || !draft.templateKey) {
+  if (!draft || typeof draft !== "object" || !draft.templateKey || !draft.contact) {
     return Response.json({ error: "Missing or invalid resume draft" }, { status: 400 });
   }
+  if (draftTooLarge(draft)) return tooLarge();
 
   try {
     const results = await Promise.all(

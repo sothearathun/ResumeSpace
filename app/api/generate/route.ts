@@ -1,20 +1,38 @@
 import { resumeChat } from "@/lib/ai/generateResume";
+import { enforceRateLimit, LIMITS } from "@/lib/apiGuard";
 
 type ChatTurn = { role: "user" | "assistant"; content: string };
 
+// Caps on what a single call can send to the paid AI provider.
+const MAX_TURNS = 20;
+const MAX_TURN_CHARS = 4000;
+const MAX_FIELD_CHARS = 8000;
+const MAX_LONG_TEXT_CHARS = 10000;
+const MAX_SKILLS = 100;
+
+function clamp(value: unknown, max: number): string | undefined {
+  return typeof value === "string" ? value.slice(0, max) : undefined;
+}
+
 function parseChatMessages(value: unknown): ChatTurn[] {
   if (!Array.isArray(value)) return [];
-  return value.filter(
-    (m): m is ChatTurn =>
-      m &&
-      typeof m === "object" &&
-      (m.role === "user" || m.role === "assistant") &&
-      typeof m.content === "string" &&
-      m.content.trim().length > 0
-  );
+  return value
+    .filter(
+      (m): m is ChatTurn =>
+        m &&
+        typeof m === "object" &&
+        (m.role === "user" || m.role === "assistant") &&
+        typeof m.content === "string" &&
+        m.content.trim().length > 0
+    )
+    .slice(-MAX_TURNS)
+    .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_TURN_CHARS) }));
 }
 
 export async function POST(request: Request) {
+  const limited = await enforceRateLimit(request, LIMITS.generate);
+  if (limited) return limited;
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();
@@ -36,16 +54,18 @@ export async function POST(request: Request) {
   try {
     const result = await resumeChat({
       messages,
-      fieldLabel: typeof body.fieldLabel === "string" ? body.fieldLabel : undefined,
-      fieldKind: typeof body.fieldKind === "string" ? body.fieldKind : undefined,
-      fieldText: typeof body.fieldText === "string" ? body.fieldText : undefined,
+      fieldLabel: clamp(body.fieldLabel, 200),
+      fieldKind: clamp(body.fieldKind, 50),
+      fieldText: clamp(body.fieldText, MAX_FIELD_CHARS),
       context: {
-        jobTitle: typeof context.jobTitle === "string" ? context.jobTitle : undefined,
-        company: typeof context.company === "string" ? context.company : undefined,
-        targetRole: typeof context.targetRole === "string" ? context.targetRole : undefined,
-        jobDescription: typeof context.jobDescription === "string" ? context.jobDescription : undefined,
-        skills: Array.isArray(context.skills) ? context.skills : [],
-        experienceSummary: typeof context.experienceSummary === "string" ? context.experienceSummary : undefined,
+        jobTitle: clamp(context.jobTitle, 200),
+        company: clamp(context.company, 200),
+        targetRole: clamp(context.targetRole, 200),
+        jobDescription: clamp(context.jobDescription, MAX_LONG_TEXT_CHARS),
+        skills: Array.isArray(context.skills)
+          ? context.skills.filter((s): s is string => typeof s === "string").slice(0, MAX_SKILLS).map((s) => s.slice(0, 80))
+          : [],
+        experienceSummary: clamp(context.experienceSummary, MAX_LONG_TEXT_CHARS),
       },
     });
     return Response.json(result);

@@ -83,6 +83,16 @@ export default function PrivacyPage() {
           </section>
 
           <section>
+            <h2 className="text-[19px] font-semibold">Abuse prevention</h2>
+            <p className="mt-3 text-text-secondary">
+              To stop misuse of the AI and PDF features, we count requests per visitor. If you&rsquo;re signed
+              in that&rsquo;s tied to your account; otherwise it&rsquo;s tied to a one-way hash of your IP
+              address, so we never store the address itself. These counters are short-lived and old ones are
+              periodically deleted automatically.
+            </p>
+          </section>
+
+          <section>
             <h2 className="text-[19px] font-semibold">Analytics and ads</h2>
             <p className="mt-3 text-text-secondary">
               We use Vercel Analytics to count page views and visitors. It doesn&rsquo;t use cookies and

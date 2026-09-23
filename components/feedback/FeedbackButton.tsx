@@ -48,6 +48,9 @@ export function FeedbackButton() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ kind, message, email, path: pathname }),
       });
+      if (res.status === 429) {
+        throw new Error("You've sent a lot of feedback recently — please try again later.");
+      }
       if (!res.ok) {
         const data = await res.json().catch(() => null);
         throw new Error(data?.error ?? "Couldn't send feedback — please try again.");
