@@ -3,7 +3,7 @@ import { renderResumePdf } from "@/lib/pdf/renderResumePdf";
 import { draftTooLarge, enforceRateLimit, LIMITS, tooLarge } from "@/lib/apiGuard";
 
 function filenameFor(draft: ResumeDraft): string {
-  const base = draft.contact.name.trim().replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "");
+  const base = draft.contact.name.slice(0, 80).trim().replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "");
   return `${base || "resume"}.pdf`;
 }
 
